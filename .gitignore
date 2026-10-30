@@ -1,6 +1,39 @@
+# Built output
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+build/
+
+# Gradle
 .gradle/
-.kotlin/
-**/build/
-local.properties
+gradle-app.setting
+.gradletasknamecache
+
+# IDE / AndroidIDE
 .idea/
+.acside/
+.androidide/
+*.iml
+local.properties
+
+# Native build output
+app/src/main/jni/obj/
+app/src/main/jni/libs/
+obj/
+libs/
+
+# Logs and junk
+*.log
 .DS_Store
+Thumbs.db
+
+# Secrets / local signing
+*.jks
+*.keystore
+keystore.properties

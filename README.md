@@ -1,52 +1,70 @@
-# Amash Engine-8BP
+# 8BP Native Module
 
-AndroidIDE-ready Kotlin project for an access-key gated launcher for the official 8 Ball Pool app.
+Native ImGui menu for **8 Ball Pool** (`com.miniclip.eightballpool`), built with
+NDK, Substrate/And64InlineHook and xhook. The library (`libgdtqis.so`) is meant to
+run **inside the game process** (root/Zygisk or a patched APK); the companion APK
+only bundles it, shows its status and lets you extract it.
 
-## App details
+## What changed in this build
 
-- App name: Amash Engine-8BP
-- Android application ID: `LUCKY.HUB.LOADER`
-- Kotlin namespace: `lucky.hub.loader`
-- Main game: 8 Ball Pool
-- Minimum Android version: Android 5.0 Lollipop (API 21)
-- Key panel: `https://venomkey.com/connect`
+- **Login and expiry removed.** No license server, no key input, no countdown.
+  The menu opens directly and reports `Lifetime`.
+- Removed the key/login HTTP stack and the prebuilt curl/OpenSSL libraries.
+- Added the missing Java sources (`MainActivity`, JNI `SurfaceView` bridge) so the
+  project actually assembles.
+- Fixed Gradle setup: no more `jcenter()`, working repository list, signed
+  (debug-key) release build, correct minSdk/ABI comments.
+- Fixed NDK flags (`-Werror` + `-w` conflict) and removed unused icon headers
+  (~23 MB smaller).
+- `get8BPbase()` now times out instead of looping forever, and hooks are skipped
+  safely when the target library is not found.
 
-## Startup flow
+## Layout
 
-1. `SplashActivity` plays the bundled banner video behind the loading progress before key login.
-2. `KeyLoginActivity` accepts or pastes a license key and verifies it with the key panel.
-3. On success, `MainActivity` shows the Games, Resellers, Profile, and Settings tabs. The 8 Ball Pool card launches the installed game; if it is not installed, the card downloads the APK from `GAME_DOWNLOAD_URL` and shows progress. Android's package installer asks for confirmation, then launches the game after installation succeeds. The game runs as its own Android app. Android 8 and newer may first ask you to allow Lucky Hub to install apps in system settings.
+```
+app/src/main/java/...            companion app + JNI bridge
+app/src/main/jni/main.cpp        JNI_OnLoad, hooks, JNI exports
+app/src/main/jni/menu.h          ImGui menu + ESP + overlay
+app/src/main/jni/game/           reversed game structures and helpers
+app/src/main/jni/include/        hook/input/obfuscation utilities + external libs
+app/src/main/jni/icons/          embedded PNG headers
+```
 
-Set `GAME_DOWNLOAD_URL` in `app/src/main/java/lucky/hub/loader/AppConfig.kt` to an authorized direct HTTPS APK link. It is blank by default, and downloads show a configuration error until a link is provided.
+## Build
 
-The banner videos, still-image fallback, game artwork, and app icon are stored in `app/src/main/res`. The splash and Games screens share one bundled video, play it silently on a loop, pause when the screen is not active, and show the still banner if a device cannot decode a video. The Settings tab also lets users refresh the GitHub version notice.
+Requirements: JDK 17, Android SDK 34, NDK `24.0.8215888`, Gradle 8.5.
 
-The game is installed as the separate Android package `com.miniclip.eightballpool`; this loader opens it from the Games card. A regular Android app cannot hide another package’s launcher icon, so users can remove a home-screen shortcut manually, but the game can still appear in the app drawer. Hiding it system-wide requires device-owner or system privileges.
+```bash
+# local.properties must point at your SDK
+echo "sdk.dir=/path/to/Android/Sdk" > local.properties
+./gradlew assembleDebug
+# output: app/build/outputs/apk/debug/app-debug.apk
+```
 
-## Key panel settings
+Release builds use the debug signing key so the APK stays installable. Replace
+the signing config in `app/build.gradle` before publishing.
 
-`app/src/main/java/lucky/hub/loader/AppConfig.kt` contains `KEY_PANEL_URL` and `KEY_GAME_ID`. The game identifier is kept as `PUBG` because it is part of the supplied `key-system` request and response-signature protocol.
+The included GitHub Actions workflow (`.github/workflows/build-apk.yml`) builds a
+debug APK on every push and uploads it as an artifact.
 
-The client posts the entered key and device serial, then checks the response status, timestamp, expiry, and MD5 token using the supplied protocol. The Android platform's normal HTTPS certificate and hostname checks stay enabled. Only a masked key, expiry, and device serial are stored locally; the raw key is not saved. The key panel and its key database must be available for activation to succeed.
+## Usage
 
-The supplied protocol includes a shared signing value in the Android client. That preserves compatibility with the provided panel, but any value embedded in an APK can be recovered by someone who decompiles it. For production licensing, signature validation should ultimately be enforced by the panel itself.
+1. Install the APK.
+2. Tap **Extract libgdtqis.so**.
+3. Place the library in your injector / Zygisk module and scope it to
+   `com.miniclip.eightballpool`.
+4. Start the game; open the menu from the floating button.
 
-## GitHub update notice
+The library targets a specific game build. The inline hook offsets in
+`app/src/main/jni/main.cpp` must match the installed `libmain.so` version,
+otherwise the game may crash on launch.
 
-1. The configured `GITHUB_CONFIG_URL` points to `config.json` attached to the `LUCKYHUB` GitHub release. Upload the updated JSON as that release asset.
-2. If you prefer a file on the main branch, change `GITHUB_CONFIG_URL` to that file's raw GitHub URL.
-3. Update the version, message, and loader APK `downloadUrl` for each loader release.
+## Notes
 
-Example:
+- Only `arm64-v8a` is built (the hook engine and prebuilt assets are 64-bit).
+- `local.properties`, IDE folders and build output are git-ignored.
+- Modding the game violates Miniclip's terms of service. Use at your own risk.
 
-    {
-      "version": "1.0.2",
-      "message": "Welcome to Amash Engine-8BP.",
-      "downloadUrl": "https://github.com/OWNER/REPOSITORY/releases/download/TAG/LuckyHubLoader.apk"
-    }
+## License
 
-The `downloadUrl` must point to the signed Lucky Hub loader APK for that version. Set `versionName` in `app/build.gradle` to the same version, increase `versionCode`, and sign the APK with the same key used for the installed app. After the key login succeeds, a newer loader version opens a notice with **Later** and **Update** actions. **Update** downloads the loader APK, checks that its package name and version match the app and config, and opens Android's installer. This is separate from `GAME_DOWNLOAD_URL`, which remains the 8 Ball Pool game download. If `downloadUrl` is missing, the version notice still works and the app explains that the loader APK link must be added.
-
-## Open in AndroidIDE
-
-Open the `LUCKY_HUB_LOADER` directory as a Gradle project. It targets SDK 34 and uses JDK 17, AGP 8.2.2, Gradle 8.2.1, and Kotlin 2.0.0. AndroidIDE can create `local.properties` for its SDK path.
+See `LICENSE`.

@@ -1,18 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="night_950">#18181A</color>
-    <color name="night_900">#202023</color>
-    <color name="night_850">#252529</color>
-    <color name="surface_border">#343438</color>
-    <color name="ink_primary">#F4F4F5</color>
-    <color name="ink_secondary">#9B9BA2</color>
-    <color name="pool_green">#37C77C</color>
-    <color name="pool_green_dark">#163B29</color>
-    <color name="signal_blue">#22D3EE</color>
-    <color name="signal_yellow">#FFD166</color>
-    <color name="accent_pink">#E82F73</color>
-    <color name="splash_surface">#E7E8EA</color>
-    <color name="splash_card">#F5F5F6</color>
-    <color name="splash_ink">#25272B</color>
-    <color name="login_surface">#EEEEF0</color>
-    <color name="login_ink">#26282C</color>
 </resources>

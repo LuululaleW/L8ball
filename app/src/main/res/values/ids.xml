@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="language_text_translation_state" type="id" />
-    <item name="language_hint_translation_state" type="id" />
-    <item name="language_error_translation_state" type="id" />
-    <item name="language_description_translation_state" type="id" />
-</resources>
