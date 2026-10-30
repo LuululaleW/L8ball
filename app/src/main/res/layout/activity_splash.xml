@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/splashRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_amash_splash"
+    android:keepScreenOn="true">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#22FFFFFF" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="28dp"
+        android:layout_marginEnd="28dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/splashLogo"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:alpha="0.98"
+            android:background="@drawable/bg_amash_logo"
+            android:contentDescription="Amash Engine"
+            android:elevation="6dp"
+            android:padding="13dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/amash_logo" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="214dp"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/bg_splash_video_card"
+            android:elevation="8dp"
+            android:padding="7dp">
+
+            <ImageView
+                android:id="@+id/splashBanner"
+                android:layout_width="match_parent"
+                android:layout_height="164dp"
+                android:contentDescription="Amash Engine banner"
+                android:importantForAccessibility="no"
+                android:scaleType="centerCrop"
+                android:src="@drawable/amash_banner" />
+
+            <VideoView
+                android:id="@+id/splashBannerVideo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:importantForAccessibility="no"
+                android:keepScreenOn="true" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/splashTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif"
+            android:letterSpacing="0.24"
+            android:text="AMASH ENGINE"
+            android:textColor="#252A30"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:letterSpacing="0.12"
+            android:text="8 BALL POOL LOADER"
+            android:textColor="#59636E"
+            android:textSize="10sp" />
+    </LinearLayout>
+</FrameLayout>
